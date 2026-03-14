@@ -13,6 +13,8 @@
 ### 1. Movies and TV Shows Ratings App
 **Mobile**
 
+The app would be more interactive than if it were a website.
+ It would have: 
 - Push notifications when friends rate something.
 - Real-time ratings while watching a movie.
 
@@ -22,15 +24,21 @@ This app gives quick, honest ratings from friends or trusted users, helping peop
 
 **Market** 
 
+The user base would include of the entertainment group, which is massive. Millions watch movies and tv daily, and apps such as Leterboxd prove demand. 
 
 **Habit** 
 
+Potentially high habit
+- Users open the app every time they finish watching a movie or show
+- Users consume and create content 
 
 **Scope**
 
 
 ### 2. Anti Procrasination App 
 **Mobile** 
+
+The app would have: 
 - Push notifications to remind users to work
 - Timers and focus sessions
 - Phone sensors to detect inactivity
@@ -43,12 +51,20 @@ Procrastination is a universal problem. Students, remote workers, and freelancer
 
 **Market** 
 
+Huge productivity market.
+
 **Habit** 
+
+Potentially high habit
+- Users may open it for study sessions, work sessions, etc.
+- Users actively create tasks and track progress. 
 
 **Scope**
 
 ### 3. Hidden Local Spots App 
 **Mobile** 
+
+Mobile features it would have: 
 - GPS/location to find hidden restaurants nearby
 - Maps integration
 - Camera for food photos
@@ -59,13 +75,19 @@ Procrastination is a universal problem. Students, remote workers, and freelancer
 
 Tourists and locals often want hidden food spots locals actually love. The app reveals underrated restaurants, street food, and local favorites that aren't easily found on big apps. It focuses on discovery instead of mainstream reviews.
 
-**Market** 
+**Market**
+
+Food discovery is huge. The niche of the app would be community recommendations and secret local food spots. 
 
 **Habit** 
+
+Medium habit potential
+- Users open it wher deciding to where to eat, when traveling, exploring new locations, etc.
+- Users consume and create content (uploading spots and reviews)
 
 **Scope**
 
 
 ## Final Decision: 
 
-[final decision here]
+Movies and TV Shows Ratings App
