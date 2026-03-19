@@ -18,12 +18,12 @@
 ### App Evaluation
 
 [Evaluation of your app across the following attributes]
-- **Category:** [e.g., Social, Entertainment, Education]
-- **Mobile:** [Is it a mobile application only?]
-- **Story:**  [What story does your app tell?]
-- **Market:** [Target audience for the app]
-- **Habit:** [Is it a daily use app or occasional use?]
-- **Scope:** [Is it a broad or narrow app in terms of features?]
+- **Category:** Entertainment/Social
+- **Mobile:** It will be desgined as a mobile first iOS app
+- **Story:**  People waste time scrolling trying to decide what to watch. Our application solves this by giving quick, trusted, community-based ratings, helping users instantly decide if something is worth their time.
+- **Market:** Movie watchers, TV fans, young adults, social media users.
+- **Habit:** Opened frequently (after watching content or browsing for something new)
+- **Scope:** Moderate scope; Core features are manageable for a semester.
 
 ## Product Spec
 
@@ -31,13 +31,21 @@
 
 **Required Must-have Stories**
 
-* [User can [specific action, e.g., register an account]]
-* ...
+* User can register and log in
+* User can search for movies and TV shows
+* User can view movie/TV show details (title, description, rating, poster)
+* User can rate a movie or show
+* User can view average ratings from other users
+* User can view a list of popular or trending content
 
 **Optional Nice-to-have Stories**
 
-* [User can [specific action, e.g., persist user information across working sessions]]
-* ...
+* User can leave written reviews/comments
+* User can follow friends and see their ratings
+* User can create a watchlist
+* User can receive notifications when friends rate something
+* User can filter by genre, popularity, or rating
+* User can see personalized recommendations
 
 ### 2. Screen Archetypes
 
