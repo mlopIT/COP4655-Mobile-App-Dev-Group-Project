@@ -34,6 +34,7 @@ Potentially high habit
 
 **Scope**
 
+Very buildable with medium difficulty.
 
 ### 2. Anti Procrasination App 
 **Mobile** 
@@ -61,6 +62,8 @@ Potentially high habit
 
 **Scope**
 
+Moderate difficulty. 
+
 ### 3. Hidden Local Spots App 
 **Mobile** 
 
@@ -87,6 +90,7 @@ Medium habit potential
 
 **Scope**
 
+Not too difficult.
 
 ## Final Decision: 
 
