@@ -70,10 +70,16 @@
 
 **Flow Navigation** (Screen to Screen)
 
-- [ ] [**Screen Name**]
-  * Leads to [**Next Screen**]
-- [ ] [**Another Screen Name**]
-  * Leads to [**Another Screen**] 
+- [ ] [**Home Screen**]
+  * Leads to [**Detail Screen**] when user taps a movie or show
+- [ ] [**Search Screen**]
+  * Leads to [**Detail Screen**] when user taps a movie or show
+- [ ] [**Detail Screen**]
+  * Leads to [**Login Screen**] if user tries to rate while not logged in
+- [ ] [**Login Screen**]
+  * Leads to [**Detail Screen**] after successful login
+- [ ] [**Sign Up Screen**]
+  * Leads to [**Detail Screen**] after account creation
 
 
 ## Wireframes
@@ -89,19 +95,59 @@
 
 ### Models
 
-[Model Name, e.g., User]
+[User]
 | Property | Type   | Description                                  |
 |----------|--------|----------------------------------------------|
-| username | String | unique id for the user post (default field)   |
-| password | String | user's password for login authentication      |
-| ...      | ...    | ...                          
+| id       | UUID   | unique id for the user post (default field)  |
+| email    | String | user's email for login                       |
+| password | String | user's password                              |                      
 
+
+[Movie]
+| Property | Type   | Description                                  |
+|----------|--------|----------------------------------------------|
+| id       | Int    | TMDB movie id                                | 
+| title    | String | movie title                                  |
+| description| String | movie overview                             |
+| posterURL| String | link to poster image                         | 
+| releaseDate| Date | movie release date                           |
+| tmdbRating| Float | third party rating                           |
+
+[TVShow]
+| Property | Type   | Description                                  |
+|----------|--------|----------------------------------------------|
+| id       | Int    | TMDB tv show id                              |
+| title    | String | show title                                   |
+| description| String| show overview                               |
+| posterURL| String | link to poster image                         |
+| firstAirDate| Date| first air date                               |
+| tmdbRating| Float | initial third-party rating                   |
+
+
+[Review]
+| Property | Type   | Description                                  |
+|----------|--------|----------------------------------------------|
+| id       | UUID   | unique review id                             |
+| userId   | UUID   | references User                              |
+| mediaId  | Int    | references movie or tv show id               |
+| rating   | Float  | numerical rating                             |
+| comment  | String | written review text                          |
+| createdAt| DateTime| review submission date                      |
 
 ### Networking
 
-- [List of network requests by screen]
-- [Example: `[GET] /users` - to retrieve user data]
-- ...
-- [Add list of network requests by screen ]
-- [Create basic snippets for each Parse network request]
-- [OPTIONAL: List endpoints if using existing API such as Yelp]
+TMDB API Requests
+- `[GET] /trending/movie/day` - to retrieve trending movies
+- `[GET] /trending/tv/day` - to retrieve trending TV shows
+- `[GET] /search/movie` - to search for movie by title
+- `[GET] /search/tv` - search for tv shows by title
+- `[GET] /movie/{id}` - retrieves movie details
+- `[GET] /tv/{id}` - retrieves tv show details
+
+Supabase Requests
+- `[POST] /auth/signup` - create new user account
+- `[POST] /auth/login` - authenticate existing user
+- `[GET] /reviews/{mediaId}` - retrieve all reviews for a movie or show
+- `[POST] /reviews` - submit a rating and written review
+- `[PUT] /reviews/{reviewId}` - edit existing review
+- `[DELETE] /reviews/{reviewId}` - delete review
