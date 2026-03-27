@@ -13,7 +13,11 @@
 
 ### Description
 
-[Provide a brief description of your app, its purpose, and functionality.]
+[app name] is a community-driven iOS mobile application that allows users to search, rate, and review movies and TV shows. The app helps users quickly decide what to watch by providing aggregated community ratings and reviews.
+
+Users can browse trending movies and shows without creating an account. Ratings initially come from the TMDB API and appear greyed out to indicate they are temporary placeholder ratings. As real users submit their own ratings and written reviews, the community score replaces the placeholder rating and becomes the primary score displayed.
+
+The app is built natively using Swift and SwiftUI in Xcode with a fully programmatic UI. Supabase is used for backend authentication and database storage, while TMDB API provides movie and TV show data such as titles, posters, descriptions, and initial ratings.
 
 ### App Evaluation
 
@@ -49,24 +53,35 @@
 
 ### 2. Screen Archetypes
 
-- [ ] [**Screen Name, e.g., Login Screen**]
-* [Required User Feature: User can log in.]
-- [ ] [**Another Screen Name**]
-* [Associated required user story]
-...
-...
-...
+- [ ] [**Home Screen**]
+* User can view trending movies
+* User can view trending TV shows
+* User can view top rated content
+* User can select a movie or show to view details
+- [ ] [**Search Screen**]
+* User can search for movies and TV shows by title
+* User can view search results from TMDB API
+- [ ] [**Detail Screen**]
+* User can view movie or TV show information (poster, description, rating)
+* User can view average community rating
+* User can read user reviews
+* User can submit a rating and review
+- [ ] [**Login Screen**]
+* User can log in to an existing account
+* User can create a new account
+* Appears when user attempts to rate without being logged in (lazy registration)
+- [ ] [**Sign Up Screen**]
+* User can create a new account with email and password
+
 
 ### 3. Navigation
 
 **Tab Navigation** (Tab to Screen)
 
 
-- [ ] [First Tab, e.g., Home Feed]
-- [ ] [Second Tab, e.g., Profile]
-...
-...
-...
+- [ ] Home
+- [ ] Search
+- [ ] Profile
 
 **Flow Navigation** (Screen to Screen)
 
