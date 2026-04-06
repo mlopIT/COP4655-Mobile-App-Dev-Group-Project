@@ -103,10 +103,11 @@ The app is built natively using Swift and SwiftUI in Xcode with a fully programm
 
 ### [BONUS] Digital Wireframes & Mockups
 <figure>
-  <video src="https://github.com/mlopIT/COP4655-Mobile-App-Dev-Group-Project/blob/main/App/Resources/Wireframes/wireframe-demo.mp4" width="400" controls muted>
+  <video src="https://github.com/user-attachments/assets/afac838c-f372-4305-b230-b7e83848ef97" width="400" controls muted>
   </video>
   <figcaption><b>Demo:</b> Interactive scroll and navigation flow of the wireframes.</figcaption>
 </figure>
+
 ### [BONUS] Interactive Prototype
 
 ## Schema 
