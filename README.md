@@ -1,6 +1,6 @@
 # COP4655-Mobile-App-Dev-Group-Project
 ===
-# APP_NAME_HERE
+# CINERATE
 
 ## Table of Contents
 
@@ -13,7 +13,7 @@
 
 ### Description
 
-[app name] is a community-driven iOS mobile application that allows users to search, rate, and review movies and TV shows. The app helps users quickly decide what to watch by providing aggregated community ratings and reviews.
+CINERATE is a community-driven iOS mobile application that allows users to search, rate, and review movies and TV shows. The app helps users quickly decide what to watch by providing aggregated community ratings and reviews.
 
 Users can browse trending movies and shows without creating an account. Ratings initially come from the TMDB API and appear greyed out to indicate they are temporary placeholder ratings. As real users submit their own ratings and written reviews, the community score replaces the placeholder rating and becomes the primary score displayed.
 
