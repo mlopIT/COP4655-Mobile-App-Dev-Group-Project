@@ -45,79 +45,25 @@ struct HomeScreen: View {
                         MovieHeroView()
                             .frame(height: 500) // Defining the height for the preview layout
                         
-                        // 2. THE NEW COMPONENT: Top Rated Section
                         // We add vertical padding so it doesn't touch the hero image
                         TopRatedSection()
                             .padding(.vertical, AppSpacing.xl)
                         
-                        // 3. Theme Cards Section
-                        ZStack {
-                            LinearGradient(
-                                colors: [.blue, .purple],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                            .frame(minHeight: 400)
-                            
-                            
-                            
-                            ZStack {
-                                // Background for glass effect visibility
-                                LinearGradient(
-                                    colors: [.blue, .purple],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                                .frame(minHeight: 400)
-                                
-                                VStack(spacing: AppSpacing.lg) {
-                                    // Dark Theme Card
-                                    VStack {
-                                        Text("Dark Theme")
-                                            .font(DarkTheme().typography.headlineLarge)
-                                            .foregroundColor(DarkTheme().colors.onSurface)
-                                        Text("CineRate Glass Effect")
-                                            .font(DarkTheme().typography.body)
-                                            .foregroundColor(DarkTheme().colors.onSurfaceVariant)
-                                    }
-                                    .padding()
-                                    .glass()
-                                    .environment(\.theme, DarkTheme())
-                                    
-                                    // Light Theme Card
-                                    VStack {
-                                        Text("Light Theme")
-                                            .font(LightTheme().typography.headlineLarge)
-                                            .foregroundColor(LightTheme().colors.onSurface)
-                                        Text("CineRate Glass Effect")
-                                            .font(LightTheme().typography.body)
-                                            .foregroundColor(LightTheme().colors.onSurfaceVariant)
-                                        
-                                        Button("Learn More") {
-                                            // action
-                                        }
-                                        .buttonStyle(GlassButtonStyle())
-                                    }
-                                    .padding()
-                                    .glass()
-                                    .environment(\.theme, LightTheme())
-                                    
-                                    
-                                }
-                                .padding(AppSpacing.lg)
-                            }
-                        }
+                        // 3. Explore Genres Section
+                        ExploreGenresSection()
+                            .padding(.bottom, AppSpacing.xl)
+                            .padding(.bottom, AppSpacing.xl)
                     }
                     .ignoresSafeArea(edges: .top) // Essential for the Hero to reach the top
                     .background(AppColors.surface)
                     
-                    // 3. The Navigation Layer
-                    CustomNavigationBar()
-                    // Ensure the theme is injected if using .glass() or theme tokens
-                        .environment(\.theme, DarkTheme())
-                    
                 }
             }
+            
+            // 3. The Navigation Layer - Now pinned to bottom of ZStack
+            CustomNavigationBar()
+                // Ensure the theme is injected if using .glass() or theme tokens
+                .environment(\.theme, DarkTheme())
         }
     }
 }
