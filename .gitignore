@@ -1,6 +1,9 @@
 # macOS
 .DS_Store
 
+# Ignore Secrets File
+Secrets.xcconfig
+
 # Xcode user data
 xcuserdata/
 *.xcuserstate
