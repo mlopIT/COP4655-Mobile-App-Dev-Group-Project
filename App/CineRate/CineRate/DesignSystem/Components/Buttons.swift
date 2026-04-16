@@ -1,23 +1,7 @@
 import SwiftUI
 
-struct PrimaryButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .padding()
-            .background(
-                LinearGradient(
-                    colors: [
-                        AppColors.primary,
-                        AppColors.primaryContainer
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .cornerRadius(AppRadius.full)
-            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
-    }
-}
+// Note: PrimaryButtonStyle, SecondaryButtonStyle, and IconButtonStyle 
+// are now defined in ButtonStyles.swift
 
 struct GlassButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
