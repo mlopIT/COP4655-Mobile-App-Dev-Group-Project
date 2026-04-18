@@ -16,14 +16,14 @@ struct SearchHeaderSection: View {
                 .tracking(1)
             
             // Search Bar
-            SearchBar(searchText: $searchText, isSearchFieldFocused: $isSearchFieldFocused)
+            SearchBarComponent(searchText: $searchText, isSearchFieldFocused: $isSearchFieldFocused)
         }
         .padding(.horizontal, AppSpacing.lg)
     }
 }
 
 // MARK: - Search Bar Component
-struct SearchBar: View {
+struct SearchBarComponent: View {
     @Binding var searchText: String
     @FocusState.Binding var isSearchFieldFocused: Bool
     
@@ -61,20 +61,31 @@ struct SearchBar: View {
 
 // MARK: - Popular Searches Section
 struct PopularSearchesSection: View {
+    @State private var recentSearches: [String] = []
+    let onSearchTap: (String) -> Void
+    
     let popularSearches = [
         "Action Movies",
         "Christopher Nolan",
         "Marvel",
         "Sci-Fi Classics",
         "Horror",
-        "Comedies"
+        "Comedies",
+        "Drama",
+        "Thriller",
+        "Romance"
     ]
     
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.xl) {
             
             // Recent Searches (if any)
-            RecentSearchesSection()
+            if !recentSearches.isEmpty {
+                RecentSearchesSection(
+                    recentSearches: $recentSearches,
+                    onSearchTap: onSearchTap
+                )
+            }
             
             // Popular/Trending Searches
             VStack(alignment: .leading, spacing: AppSpacing.md) {
@@ -96,23 +107,24 @@ struct PopularSearchesSection: View {
                 // Popular Search Tags
                 FlowLayout(spacing: AppSpacing.sm) {
                     ForEach(popularSearches, id: \.self) { search in
-                        SearchTagButton(title: search)
+                        SearchTagButton(title: search) {
+                            onSearchTap(search)
+                        }
                     }
                 }
             }
             .padding(.horizontal, AppSpacing.lg)
+        }
+        .onAppear {
+            recentSearches = RecentSearchManager.shared.getRecentSearches()
         }
     }
 }
 
 // MARK: - Recent Searches Section
 struct RecentSearchesSection: View {
-    // Sample recent searches - in a real app, this would come from UserDefaults or a database
-    let recentSearches = [
-        "Inception",
-        "The Matrix",
-        "Blade Runner"
-    ]
+    @Binding var recentSearches: [String]
+    let onSearchTap: (String) -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
@@ -136,7 +148,8 @@ struct RecentSearchesSection: View {
                 
                 // Clear All Button
                 Button(action: {
-                    print("Clear all recent searches")
+                    RecentSearchManager.shared.clearAll()
+                    recentSearches = []
                 }) {
                     Text("CLEAR")
                         .font(AppFonts.label)
@@ -147,7 +160,12 @@ struct RecentSearchesSection: View {
             // Recent Search Items
             VStack(spacing: AppSpacing.sm) {
                 ForEach(recentSearches, id: \.self) { search in
-                    RecentSearchRow(searchText: search)
+                    RecentSearchRow(searchText: search) {
+                        onSearchTap(search)
+                    } onDelete: {
+                        RecentSearchManager.shared.removeSearch(search)
+                        recentSearches = RecentSearchManager.shared.getRecentSearches()
+                    }
                 }
             }
         }
@@ -213,14 +231,8 @@ struct SearchTagButton: View {
 // MARK: - Search Results Section
 struct SearchResultsSection: View {
     let searchQuery: String
-    
-    // Sample data - replace with actual search results
-    let sampleMovies = [
-        SearchResultItem(id: "1", title: "THE DARK KNIGHT", year: "2008", type: "MOVIE", imageName: "film image"),
-        SearchResultItem(id: "2", title: "INCEPTION", year: "2010", type: "MOVIE", imageName: "film image"),
-        SearchResultItem(id: "3", title: "INTERSTELLAR", year: "2014", type: "MOVIE", imageName: "film image"),
-        SearchResultItem(id: "4", title: "THE PRESTIGE", year: "2006", type: "MOVIE", imageName: "film image"),
-    ]
+    let results: [Media]
+    let isSearching: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
@@ -232,86 +244,195 @@ struct SearchResultsSection: View {
                     .foregroundColor(AppColors.onSurfaceVariant)
                     .tracking(1.5)
                 
-                Text("FOUND \(sampleMovies.count) RESULTS")
-                    .font(AppFonts.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(AppColors.onSurface)
-                    .tracking(1)
-            }
-            .padding(.horizontal, AppSpacing.lg)
-            
-            // Results Grid
-            LazyVGrid(columns: [
-                GridItem(.flexible(), spacing: AppSpacing.md),
-                GridItem(.flexible(), spacing: AppSpacing.md)
-            ], spacing: AppSpacing.md) {
-                ForEach(sampleMovies) { movie in
-                    SearchResultCard(item: movie)
+                if isSearching {
+                    HStack(spacing: AppSpacing.sm) {
+                        ProgressView()
+                            .tint(AppColors.primary)
+                            .scaleEffect(0.8)
+                        Text("SEARCHING...")
+                            .font(AppFonts.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(AppColors.onSurface)
+                            .tracking(1)
+                    }
+                } else {
+                    Text("FOUND \(results.count) RESULTS")
+                        .font(AppFonts.title)
+                        .fontWeight(.bold)
+                        .foregroundColor(AppColors.onSurface)
+                        .tracking(1)
                 }
             }
             .padding(.horizontal, AppSpacing.lg)
+            
+            if isSearching {
+                // Loading skeletons
+                LazyVGrid(columns: [
+                    GridItem(.flexible(), spacing: AppSpacing.md),
+                    GridItem(.flexible(), spacing: AppSpacing.md)
+                ], spacing: AppSpacing.md) {
+                    ForEach(0..<6, id: \.self) { _ in
+                        SearchResultCardSkeleton()
+                    }
+                }
+                .padding(.horizontal, AppSpacing.lg)
+            } else if results.isEmpty {
+                // Empty state
+                VStack(spacing: AppSpacing.md) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 60))
+                        .foregroundColor(AppColors.onSurfaceVariant.opacity(0.3))
+                    
+                    Text("No results found")
+                        .font(AppFonts.title)
+                        .foregroundColor(AppColors.onSurface)
+                    
+                    Text("Try different keywords")
+                        .font(AppFonts.body)
+                        .foregroundColor(AppColors.onSurfaceVariant)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, AppSpacing.xxl)
+            } else {
+                // Results Grid
+                LazyVGrid(columns: [
+                    GridItem(.flexible(), spacing: AppSpacing.md),
+                    GridItem(.flexible(), spacing: AppSpacing.md)
+                ], spacing: AppSpacing.md) {
+                    ForEach(results) { media in
+                        SearchResultCardComponent(media: media)
+                    }
+                }
+                .padding(.horizontal, AppSpacing.lg)
+            }
         }
     }
 }
 
-// MARK: - Search Result Data Model
-struct SearchResultItem: Identifiable {
-    let id: String
-    let title: String
-    let year: String
-    let type: String
-    let imageName: String
-}
-
-// MARK: - Search Result Card
-struct SearchResultCard: View {
-    let item: SearchResultItem
+// MARK: - Search Result Card (Updated for Real Data)
+struct SearchResultCardComponent: View {
+    let media: Media
     var onTap: () -> Void = {}
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            
-            // Movie Poster
-            ZStack(alignment: .topTrailing) {
-                Image(item.imageName)
-                    .resizable()
-                    .aspectRatio(2/3, contentMode: .fill)
-                    .frame(maxWidth: .infinity)
-                    .clipped()
+        NavigationLink(destination: MediaDetailScreen(media: media)) {
+            VStack(alignment: .leading, spacing: 0) {
                 
-                // Type Badge
-                Text(item.type)
-                    .font(AppFonts.label)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, AppSpacing.sm)
-                    .padding(.vertical, 4)
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(AppRadius.md)
-                    .padding(AppSpacing.sm)
+                // Movie/TV Poster
+                ZStack(alignment: .topTrailing) {
+                    if let posterPath = media.posterPath,
+                       let url = URL(string: "https://image.tmdb.org/t/p/w342\(posterPath)") {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .empty:
+                                Rectangle()
+                                    .fill(AppColors.surfaceContainer)
+                                    .aspectRatio(2/3, contentMode: .fill)
+                                    .overlay {
+                                        ProgressView()
+                                            .tint(AppColors.primary)
+                                    }
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .aspectRatio(2/3, contentMode: .fill)
+                            case .failure:
+                                posterPlaceholder
+                            @unknown default:
+                                posterPlaceholder
+                            }
+                        }
+                    } else {
+                        posterPlaceholder
+                    }
+                    
+                    // Type Badge
+                    Text(media.type == .movie ? "MOVIE" : "TV")
+                        .font(AppFonts.label)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, AppSpacing.sm)
+                        .padding(.vertical, 4)
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(AppRadius.md)
+                        .padding(AppSpacing.sm)
+                }
+                .frame(maxWidth: .infinity)
+                .clipped()
+                
+                // Movie Info
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(media.title.uppercased())
+                        .font(AppFonts.body)
+                        .fontWeight(.bold)
+                        .foregroundColor(AppColors.onSurface)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                    
+                    if !media.releaseDate.isEmpty {
+                        Text(String(media.releaseDate.prefix(4)))
+                            .font(AppFonts.bodySmall)
+                            .foregroundColor(AppColors.onSurfaceVariant)
+                    }
+                    
+                    // Rating
+                    if let rating = media.voteAverage {
+                        HStack(spacing: 4) {
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 10))
+                                .foregroundColor(.yellow)
+                            Text(String(format: "%.1f", rating))
+                                .font(AppFonts.bodySmall)
+                                .foregroundColor(AppColors.onSurface)
+                        }
+                    }
+                }
+                .padding(AppSpacing.md)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(AppColors.surfaceContainer)
             }
+            .cornerRadius(AppRadius.md)
+            .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+    
+    private var posterPlaceholder: some View {
+        Rectangle()
+            .fill(AppColors.surfaceContainer)
+            .aspectRatio(2/3, contentMode: .fill)
+            .overlay {
+                Image(systemName: media.type == .movie ? "film.fill" : "tv.fill")
+                    .font(.system(size: 30))
+                    .foregroundColor(AppColors.onSurfaceVariant.opacity(0.3))
+            }
+    }
+}
+
+// MARK: - Search Result Card Skeleton
+struct SearchResultCardSkeleton: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Rectangle()
+                .fill(AppColors.surfaceContainer)
+                .aspectRatio(2/3, contentMode: .fill)
+                .shimmer()
             
-            // Movie Info
             VStack(alignment: .leading, spacing: 4) {
-                Text(item.title)
-                    .font(AppFonts.body)
-                    .fontWeight(.bold)
-                    .foregroundColor(AppColors.onSurface)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
+                Rectangle()
+                    .fill(AppColors.surfaceContainerHigh)
+                    .frame(height: 14)
+                    .cornerRadius(4)
                 
-                Text(item.year)
-                    .font(AppFonts.bodySmall)
-                    .foregroundColor(AppColors.onSurfaceVariant)
+                Rectangle()
+                    .fill(AppColors.surfaceContainerHigh)
+                    .frame(width: 60, height: 12)
+                    .cornerRadius(4)
             }
             .padding(AppSpacing.md)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(AppColors.surfaceContainer)
         }
         .cornerRadius(AppRadius.md)
-        .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
-        .onTapGesture {
-            onTap()
-        }
     }
 }
 

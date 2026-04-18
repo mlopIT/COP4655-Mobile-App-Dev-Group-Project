@@ -4,6 +4,7 @@ import SwiftUI
 struct AboutScreen: View {
     @Environment(\.dismiss) var dismiss
     @State private var showSidebar = false
+    @State private var selectedTab: AppTab = .profile
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -308,7 +309,7 @@ struct AboutScreen: View {
             }
             
             // Bottom Navigation Bar
-            CustomNavigationBar()
+            CustomNavigationBar(selectedTab: $selectedTab)
             
             // Sidebar Overlay
             Sidebar(isShowing: $showSidebar, isLoggedIn: true)

@@ -1,10 +1,16 @@
 // File Name: RateReviewScreen.swift
 import SwiftUI
+import Auth
 
 struct RateReviewScreen: View {
     let media: Media
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var authService: AuthService
     @State private var showSidebar = false
+    @State private var selectedTab: AppTab = .home
+    
+    // Services
+    private let reviewService = ReviewService()
     
     // Review State
     @State private var rating: Double = 0
@@ -14,6 +20,9 @@ struct RateReviewScreen: View {
     // UI State
     @State private var showRatingHelper = false
     @State private var showSubmitConfirmation = false
+    @State private var isSubmitting = false
+    @State private var errorMessage: String?
+    @State private var showError = false
     @FocusState private var focusedField: Field?
     
     enum Field: Hashable {
@@ -78,11 +87,18 @@ struct RateReviewScreen: View {
                             Button(action: {
                                 submitReview()
                             }) {
-                                Text("Submit Review")
+                                HStack {
+                                    if isSubmitting {
+                                        ProgressView()
+                                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                            .scaleEffect(0.8)
+                                    }
+                                    Text(isSubmitting ? "Submitting..." : "Submit Review")
+                                }
                             }
                             .buttonStyle(PrimaryButtonStyle())
-                            .disabled(!isFormValid)
-                            .opacity(isFormValid ? 1.0 : 0.5)
+                            .disabled(!isFormValid || isSubmitting)
+                            .opacity((isFormValid && !isSubmitting) ? 1.0 : 0.5)
                             
                             Button(action: {
                                 dismiss()
@@ -91,6 +107,7 @@ struct RateReviewScreen: View {
                                     .font(AppFonts.body)
                                     .foregroundColor(AppColors.onSurfaceVariant)
                             }
+                            .disabled(isSubmitting)
                         }
                         .padding(.horizontal, AppSpacing.lg)
                         
@@ -106,7 +123,7 @@ struct RateReviewScreen: View {
             }
             
             // Bottom Navigation Bar
-            CustomNavigationBar()
+            CustomNavigationBar(selectedTab: $selectedTab)
             
             // Sidebar Overlay
             Sidebar(isShowing: $showSidebar, isLoggedIn: true)
@@ -119,16 +136,60 @@ struct RateReviewScreen: View {
         } message: {
             Text("Thank you for sharing your thoughts!")
         }
+        .alert("Error", isPresented: $showError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage ?? "An unknown error occurred.")
+        }
     }
     
     private func submitReview() {
-        // TODO: Implement API call to submit review
-        print("Submitting review:")
-        print("Rating: \(rating)")
-        print("Title: \(reviewTitle)")
-        print("Review: \(reviewText)")
+        // Ensure user is authenticated
+        guard let userId = authService.currentUser?.id else {
+            errorMessage = "You must be logged in to submit a review."
+            showError = true
+            return
+        }
         
-        showSubmitConfirmation = true
+        // Convert media ID from String to Int
+        guard let mediaId = Int(media.id) else {
+            errorMessage = "Invalid media ID."
+            showError = true
+            return
+        }
+        
+        // Map from local MediaType (in MediaModels) to Supabase DBMediaType
+        // MediaModels.MediaType has: .movie = "Movie", .tvShow = "TV Show"
+        // DBMediaType has: .movie, .tv (rawValue "movie", "tv")
+        let supabaseMediaType = DBMediaType(from: media.type)
+        
+        // Combine title and text for the comment
+        let fullComment = "**\(reviewTitle)**\n\n\(reviewText)"
+        
+        isSubmitting = true
+        
+        Task { @MainActor in
+            do {
+                // Submit review (automatically handles insert or update)
+                let submittedReview = try await reviewService.submitReview(
+                    userId: userId,
+                    mediaId: mediaId,
+                    mediaType: supabaseMediaType,
+                    rating: rating,
+                    comment: fullComment
+                )
+                
+                print("✅ Review submitted successfully: \(submittedReview.id)")
+                isSubmitting = false
+                showSubmitConfirmation = true
+                
+            } catch {
+                print("❌ Error submitting review: \(error)")
+                errorMessage = "Failed to submit review: \(error.localizedDescription)"
+                showError = true
+                isSubmitting = false
+            }
+        }
     }
 }
 

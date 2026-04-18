@@ -1,6 +1,9 @@
 import SwiftUI
 
-struct TrendingCard: View {
+// DEPRECATED: This component is replaced by the new TrendingCard in TopRatedShowsSection.swift
+// Keeping for reference only - can be deleted
+
+struct TrendingCardOld: View {
     let title: String
     let genres: String
     let rating: String

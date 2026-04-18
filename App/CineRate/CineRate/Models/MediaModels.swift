@@ -22,15 +22,20 @@ struct Media: Identifiable {
     let director: String? // For movies
     let creators: [String]? // For TV shows
     let cast: [CastMember]
-    let averageRating: Double // 0.0 to 5.0
-    let totalRatings: Int
-    let userRating: Double? // User's personal rating if logged in
-    let isInWatchlist: Bool
+    var averageRating: Double // 0.0 to 5.0 - mutable for enrichment
+    var totalRatings: Int // mutable for enrichment
+    var userRating: Double? // User's personal rating if logged in - mutable for enrichment
+    var isInWatchlist: Bool // mutable for enrichment
     let seasonCount: Int? // For TV shows
     let episodeCount: Int? // For TV shows
     let status: String? // e.g., "Continuing", "Ended"
     let trailerURL: String?
     let releaseDate: String // Full date e.g., "March 15, 2024"
+    
+    // TMDB compatibility properties
+    var posterPath: String? { posterImage.isEmpty ? nil : posterImage }
+    var backdropPath: String? { backdropImage }
+    var voteAverage: Double? { averageRating * 2 } // Convert from 0-5 to 0-10 scale
 }
 
 // MARK: - Cast Member

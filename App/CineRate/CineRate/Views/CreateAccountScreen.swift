@@ -32,13 +32,6 @@ struct CreateAccountScreen: View {
             .onTapGesture {
                 isAnyFieldFocused = false
             }
-            
-            // Bottom Navigation Bar - Hidden when keyboard is visible
-            if !isAnyFieldFocused {
-                CustomNavigationBar()
-                    .ignoresSafeArea(.container, edges: .bottom)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
         }
         .animation(.easeInOut(duration: 0.3), value: isAnyFieldFocused)
     }
@@ -198,9 +191,12 @@ struct FeatureCard: View {
 }
 
 struct RegistrationFormSection: View {
+    @StateObject private var authService = AuthService()
     @State private var name = ""
     @State private var email = ""
     @State private var password = ""
+    @State private var isLoading = false
+    @State private var errorMessage: String?
     @FocusState.Binding var isAnyFieldFocused: Bool
     
     let tastes = ["AVANT-GARDE", "SMART-INDIE", "BINGE WATCHER", "NEW WAVE"]
@@ -256,8 +252,22 @@ struct RegistrationFormSection: View {
             }
             
             VStack(spacing: AppSpacing.md) {
-                Button("CREATE ACCOUNT") { }
-                    .buttonStyle(PrimaryButtonStyle())
+                // Error message
+                if let errorMessage {
+                    Text(errorMessage)
+                        .font(AppFonts.bodySmall)
+                        .foregroundColor(.red)
+                        .padding(.horizontal, AppSpacing.md)
+                        .padding(.vertical, AppSpacing.sm)
+                        .background(Color.red.opacity(0.1))
+                        .cornerRadius(AppRadius.md)
+                }
+                
+                Button("CREATE ACCOUNT") {
+                    handleSignUp()
+                }
+                .buttonStyle(PrimaryButtonStyle())
+                .disabled(isLoading)
                 
                 // Divider with "OR"
                 HStack {
@@ -305,6 +315,36 @@ struct RegistrationFormSection: View {
             }
         }
         .padding(.horizontal, AppSpacing.lg)
+    }
+    
+    // MARK: - Sign Up Handler
+    
+    private func handleSignUp() {
+        // Validate inputs
+        guard !email.isEmpty, !password.isEmpty else {
+            errorMessage = "Please enter both email and password"
+            return
+        }
+        
+        guard password.count >= 6 else {
+            errorMessage = "Password must be at least 6 characters"
+            return
+        }
+        
+        isLoading = true
+        errorMessage = nil
+        
+        Task {
+            do {
+                try await authService.signUp(email: email, password: password)
+                // Success - navigation will be handled by auth state listener
+                print("✅ Account created successfully")
+            } catch {
+                errorMessage = "Could not create account. Email may already be in use."
+                print("❌ Sign up error: \(error)")
+            }
+            isLoading = false
+        }
     }
 }
 

@@ -331,7 +331,7 @@ extension TMDBMovie {
                 id: String(member.id),
                 name: member.name,
                 character: member.character,
-                profileImage: member.profilePath.map { TMDBService.shared.imageURL(path: $0, size: .profile) }
+                profileImage: TMDBService.shared.imageURL(path: member.profilePath, size: .profile)
             )
         } ?? []
         
@@ -345,8 +345,8 @@ extension TMDBMovie {
             runtime: runtimeStr,
             rating: adult == true ? "R" : "PG-13", // Simplified - TMDB doesn't provide ratings
             genres: genres?.map { $0.name } ?? [],
-            posterImage: posterPath.map { TMDBService.shared.imageURL(path: $0, size: .poster) } ?? "",
-            backdropImage: backdropPath.map { TMDBService.shared.imageURL(path: $0, size: .backdrop) },
+            posterImage: TMDBService.shared.imageURL(path: posterPath, size: .poster) ?? "",
+            backdropImage: TMDBService.shared.imageURL(path: backdropPath, size: .backdrop),
             overview: overview ?? "",
             director: director,
             creators: nil,
@@ -377,7 +377,7 @@ extension TMDBTVShow {
                 id: String(member.id),
                 name: member.name,
                 character: member.character,
-                profileImage: member.profilePath.map { TMDBService.shared.imageURL(path: $0, size: .profile) }
+                profileImage: TMDBService.shared.imageURL(path: member.profilePath, size: .profile)
             )
         } ?? []
         
@@ -391,8 +391,8 @@ extension TMDBTVShow {
             runtime: runtimeStr,
             rating: "TV-MA", // Simplified - TMDB doesn't provide content ratings
             genres: genres?.map { $0.name } ?? [],
-            posterImage: posterPath.map { TMDBService.shared.imageURL(path: $0, size: .poster) } ?? "",
-            backdropImage: backdropPath.map { TMDBService.shared.imageURL(path: $0, size: .backdrop) },
+            posterImage: TMDBService.shared.imageURL(path: posterPath, size: .poster) ?? "",
+            backdropImage: TMDBService.shared.imageURL(path: backdropPath, size: .backdrop),
             overview: overview ?? "",
             director: nil,
             creators: creators.isEmpty ? nil : creators,

@@ -4,6 +4,7 @@ import SwiftUI
 struct SettingsScreen: View {
     @Environment(\.dismiss) var dismiss
     @State private var showSidebar = false
+    @State private var selectedTab: AppTab = .profile
     
     // Settings State
     @State private var notificationsEnabled = true
@@ -236,7 +237,7 @@ struct SettingsScreen: View {
             }
             
             // Bottom Navigation Bar
-            CustomNavigationBar()
+            CustomNavigationBar(selectedTab: $selectedTab)
             
             // Sidebar Overlay
             Sidebar(isShowing: $showSidebar, isLoggedIn: true)

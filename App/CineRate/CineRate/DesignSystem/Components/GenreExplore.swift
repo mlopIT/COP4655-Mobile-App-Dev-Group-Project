@@ -2,9 +2,17 @@ import SwiftUI
 
 // MARK: - Data Model
 struct Genre: Identifiable {
-    let id = UUID()
+    let id: Int // TMDB genre ID
     let name: String
-    let imageName: String // your asset name in Assets.xcassets
+    let tmdbGenreId: Int
+    var imageURL: String? // TMDB backdrop URL
+    
+    init(id: Int, name: String, tmdbGenreId: Int, imageURL: String? = nil) {
+        self.id = id
+        self.name = name
+        self.tmdbGenreId = tmdbGenreId
+        self.imageURL = imageURL
+    }
 }
 
 // MARK: - Genre Row Card
@@ -15,13 +23,32 @@ struct GenreRowCard: View {
     var body: some View {
         Button(action: onTap) {
             ZStack(alignment: .leading) {
-                // Background image, clipped to pill shape
-                Image(genre.imageName)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 90)
-                    .clipped()
+                // Background image from TMDB
+                if let imageURL = genre.imageURL, let url = URL(string: imageURL) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty:
+                            // Loading state
+                            AppColors.surfaceContainer
+                                .overlay {
+                                    ProgressView()
+                                        .tint(AppColors.primary)
+                                }
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        case .failure:
+                            // Fallback gradient
+                            genreFallbackGradient
+                        @unknown default:
+                            genreFallbackGradient
+                        }
+                    }
+                } else {
+                    // Fallback gradient if no image
+                    genreFallbackGradient
+                }
 
                 // Dark gradient overlay so text is always readable
                 LinearGradient(
@@ -37,7 +64,7 @@ struct GenreRowCard: View {
                 Text(genre.name)
                     .font(AppFonts.title)
                     .fontWeight(.bold)
-                    .foregroundColor(AppColors.onSurface)
+                    .foregroundColor(.white) // Always white for readability on images
                     .tracking(1.5)
                     .padding(.leading, AppSpacing.lg)
             }
@@ -47,6 +74,14 @@ struct GenreRowCard: View {
             .clipped()
         }
         .buttonStyle(PlainButtonStyle())
+    }
+    
+    private var genreFallbackGradient: some View {
+        LinearGradient(
+            colors: [AppColors.primary, AppColors.primaryContainer],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
     }
 }
 
@@ -89,11 +124,13 @@ struct DiscoverMoreRow: View {
 
 // MARK: - Explore Genres Section
 struct ExploreGenresSection: View {
-    let genres: [Genre] = [
-        Genre(name: "THRILLER", imageName: "genre_thriller"),
-        Genre(name: "SCIFI",    imageName: "genre_scifi"),
-        Genre(name: "CLASSIC",  imageName: "genre_classic"),
+    @State private var genres: [Genre] = [
+        Genre(id: 53, name: "THRILLER", tmdbGenreId: 53),
+        Genre(id: 878, name: "SCI-FI", tmdbGenreId: 878),
+        Genre(id: 18, name: "DRAMA", tmdbGenreId: 18), // Using Drama instead of "Classic"
     ]
+    
+    @State private var isLoading = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
@@ -117,15 +154,64 @@ struct ExploreGenresSection: View {
                 ForEach(genres) { genre in
                     GenreRowCard(genre: genre) {
                         print("\(genre.name) tapped")
+                        // TODO: Navigate to genre screen
                     }
                 }
 
                 DiscoverMoreRow {
                     print("Discover More tapped")
+                    // TODO: Navigate to all genres screen
                 }
             }
         }
         .padding(AppSpacing.lg)
         .background(AppColors.surface)
+        .task {
+            await loadGenreImages()
+        }
+    }
+    
+    // MARK: - Load Genre Images from TMDB
+    
+    private func loadGenreImages() async {
+        guard isLoading else { return }
+        
+        do {
+            // Load images for each genre in parallel
+            await withTaskGroup(of: (Int, String?).self) { group in
+                for genre in genres {
+                    group.addTask {
+                        // Get top movie from this genre
+                        if let movies = try? await TMDBService.shared.discoverMovies(
+                            genre: genre.tmdbGenreId,
+                            sortBy: "popularity.desc",
+                            page: 1
+                        ), let firstMovie = movies.first,
+                           let backdropPath = firstMovie.backdropPath {
+                            let imageURL = "https://image.tmdb.org/t/p/w780\(backdropPath)"
+                            return (genre.id, imageURL)
+                        }
+                        return (genre.id, nil)
+                    }
+                }
+                
+                // Collect results and update genres
+                for await (genreId, imageURL) in group {
+                    if let imageURL = imageURL,
+                       let index = genres.firstIndex(where: { $0.id == genreId }) {
+                        genres[index].imageURL = imageURL
+                    }
+                }
+            }
+            
+            isLoading = false
+            
+            #if DEBUG
+            print("✅ Loaded genre images")
+            #endif
+        } catch {
+            print("❌ Error loading genre images: \(error)")
+            isLoading = false
+        }
     }
 }
