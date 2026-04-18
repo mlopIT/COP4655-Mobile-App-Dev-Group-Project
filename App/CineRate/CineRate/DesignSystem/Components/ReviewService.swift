@@ -9,7 +9,7 @@ final class ReviewService {
     // MARK: - Fetch Reviews
     
     /// Get all reviews for a specific media item
-    func getReviews(for mediaId: Int, mediaType: MediaType) async throws -> [Review] {
+    func getReviews(for mediaId: Int, mediaType: DBMediaType) async throws -> [Review] {
         let response: [Review] = try await client.database
             .from("reviews")
             .select("*, profile:profiles(*)")
@@ -23,7 +23,7 @@ final class ReviewService {
     }
     
     /// Get a specific user's review for a media item
-    func getUserReview(userId: UUID, mediaId: Int, mediaType: MediaType) async throws -> Review? {
+    func getUserReview(userId: UUID, mediaId: Int, mediaType: DBMediaType) async throws -> Review? {
         let response: [Review] = try await client.database
             .from("reviews")
             .select()
@@ -39,12 +39,19 @@ final class ReviewService {
     // MARK: - Average Rating
     
     /// Get average rating and total review count for a media item
-    func getAverageRating(for mediaId: Int, mediaType: MediaType) async throws -> AverageRating {
+    func getAverageRating(for mediaId: Int, mediaType: DBMediaType) async throws -> AverageRating {
+        struct RpcParams: Encodable {
+            let p_media_id: Int
+            let p_media_type: String
+        }
+        
+        let params = RpcParams(
+            p_media_id: mediaId,
+            p_media_type: mediaType.rawValue
+        )
+        
         let response: [AverageRating] = try await client.database
-            .rpc("get_average_rating", params: [
-                "p_media_id": mediaId,
-                "p_media_type": mediaType.rawValue
-            ])
+            .rpc("get_average_rating", params: params)
             .execute()
             .value
         
@@ -57,7 +64,7 @@ final class ReviewService {
     func submitReview(
         userId: UUID,
         mediaId: Int,
-        mediaType: MediaType,
+        mediaType: DBMediaType,
         rating: Double,
         comment: String?
     ) async throws -> Review {
@@ -75,13 +82,21 @@ final class ReviewService {
             )
         } else {
             // Create new review
-            let reviewData: [String: Any] = [
-                "user_id": userId.uuidString,
-                "media_id": mediaId,
-                "media_type": mediaType.rawValue,
-                "rating": rating,
-                "comment": comment as Any
-            ]
+            struct ReviewInsert: Encodable {
+                let user_id: UUID
+                let media_id: Int
+                let media_type: String
+                let rating: Double
+                let comment: String?
+            }
+            
+            let reviewData = ReviewInsert(
+                user_id: userId,
+                media_id: mediaId,
+                media_type: mediaType.rawValue,
+                rating: rating,
+                comment: comment
+            )
             
             let response: Review = try await client.database
                 .from("reviews")
@@ -103,11 +118,17 @@ final class ReviewService {
         rating: Double,
         comment: String?
     ) async throws -> Review {
-        let updateData: [String: Any] = [
-            "rating": rating,
-            "comment": comment as Any,
-            "updated_at": ISO8601DateFormatter().string(from: Date())
-        ]
+        struct ReviewUpdate: Encodable {
+            let rating: Double
+            let comment: String?
+            let updated_at: String
+        }
+        
+        let updateData = ReviewUpdate(
+            rating: rating,
+            comment: comment,
+            updated_at: ISO8601DateFormatter().string(from: Date())
+        )
         
         let response: Review = try await client.database
             .from("reviews")

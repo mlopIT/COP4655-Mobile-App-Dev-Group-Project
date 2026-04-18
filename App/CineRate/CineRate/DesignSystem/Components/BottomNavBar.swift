@@ -1,30 +1,40 @@
 import SwiftUI
 
-struct CustomNavigationBar: View {
-    @State private var selectedTab = "HOME"
+// MARK: - Tab Enum
+enum AppTab: String, CaseIterable {
+    case home = "HOME"
+    case search = "SEARCH"
+    case activity = "ACTIVITY"
+    case profile = "PROFILE"
     
-    // Define the tabs based on your image
-    let tabs = [
-        ("house", "HOME"),
-        ("magnifyingglass", "SEARCH"),
-        ("bell", "ACTIVITY"),
-        ("person", "PROFILE")
-    ]
+    var icon: String {
+        switch self {
+        case .home: return "house"
+        case .search: return "magnifyingglass"
+        case .activity: return "bell"
+        case .profile: return "person"
+        }
+    }
+}
 
+// MARK: - Custom Navigation Bar
+struct CustomNavigationBar: View {
+    @Binding var selectedTab: AppTab
+    
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(tabs, id: \.1) { icon, name in
-                Button(action: { selectedTab = name }) {
+            ForEach(AppTab.allCases, id: \.self) { tab in
+                Button(action: { selectedTab = tab }) {
                     VStack(spacing: AppSpacing.sm) {
-                        Image(systemName: icon)
+                        Image(systemName: tab.icon)
                             .font(.system(size: 20))
                         
-                        Text(name)
+                        Text(tab.rawValue)
                             .font(AppFonts.label)
                     }
                     .frame(maxWidth: .infinity)
                     // Highlight the active tab using Primary color
-                    .foregroundColor(selectedTab == name ? AppColors.primary : AppColors.onSurfaceVariant)
+                    .foregroundColor(selectedTab == tab ? AppColors.primary : AppColors.onSurfaceVariant)
                 }
             }
         }
@@ -34,6 +44,37 @@ struct CustomNavigationBar: View {
         // Applies the 32pt rounding to the top corners as seen in Nav.png
         .cornerRadius(AppRadius.lg, corners: [.topLeft, .topRight])
         .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: -5)
+    }
+}
+
+// MARK: - Main Tab Container (Use this as your root view)
+struct MainTabContainer: View {
+    @StateObject private var authService = AuthService()
+    @State private var selectedTab: AppTab = .home
+    
+    var body: some View {
+        NavigationStack {
+            ZStack(alignment: .bottom) {
+                // Content based on selected tab
+                Group {
+                    switch selectedTab {
+                    case .home:
+                        HomeScreen(selectedTab: $selectedTab)
+                    case .search:
+                        SearchScreen(selectedTab: $selectedTab)
+                    case .activity:
+                        ActivityScreen(selectedTab: $selectedTab)
+                    case .profile:
+                        ProfileScreen(selectedTab: $selectedTab)
+                    }
+                }
+                .environmentObject(authService)
+                
+                // Bottom Navigation Bar
+                CustomNavigationBar(selectedTab: $selectedTab)
+            }
+            .navigationBarHidden(true)
+        }
     }
 }
 

@@ -1,5 +1,7 @@
 import Foundation
 import Supabase
+import Auth
+import Combine
 
 /// Service for handling authentication operations
 @MainActor
@@ -11,8 +13,56 @@ final class AuthService: ObservableObject {
     private let client = SupabaseConfig.shared.client
     
     init() {
-        Task {
-            await checkAuthStatus()
+        setupAuthListener()
+    }
+    
+    // MARK: - Auth State Listener
+    
+    /// Set up listener for auth state changes across app lifecycle
+    private func setupAuthListener() {
+        Task { @MainActor in
+            do {
+                for await (event, session) in await client.auth.authStateChanges {
+                    switch event {
+                    case .signedIn:
+                        if let session = session {
+                            self.currentUser = session.user
+                            self.isAuthenticated = true
+                            print("✅ User signed in: \(session.user.email ?? "unknown")")
+                        }
+                        
+                    case .signedOut:
+                        self.currentUser = nil
+                        self.isAuthenticated = false
+                        print("👋 User signed out")
+                        
+                    case .tokenRefreshed:
+                        if let session = session {
+                            self.currentUser = session.user
+                            self.isAuthenticated = true
+                            print("🔄 Token refreshed")
+                        }
+                        
+                    case .userUpdated:
+                        if let session = session {
+                            self.currentUser = session.user
+                            print("📝 User updated")
+                        }
+                        
+                    default:
+                        break
+                    }
+                }
+            } catch is CancellationError {
+                // Auth listener was cancelled, ignore silently
+                #if DEBUG
+                print("ℹ️ Auth listener cancelled")
+                #endif
+            } catch {
+                #if DEBUG
+                print("❌ Auth listener error: \(error)")
+                #endif
+            }
         }
     }
     

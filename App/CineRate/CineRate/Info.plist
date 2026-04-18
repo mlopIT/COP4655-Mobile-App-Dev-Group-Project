@@ -2,12 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>TMDB_API_KEY</key>
-	<string>$(TMDB_API_KEY)</string>
-	<key>SUPABASE_URL</key>
-	<string>$(SUPABASE_URL)</string>
 	<key>SUPABASE_ANON_KEY</key>
 	<string>$(SUPABASE_ANON_KEY)</string>
+	<key>SUPABASE_URL</key>
+	<string>$(SUPABASE_URL)</string>
+	<key>TMDB_API_KEY</key>
+	<string>$(TMDB_API_KEY)</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Inter-VariableFont_opsz,wght.ttf</string>

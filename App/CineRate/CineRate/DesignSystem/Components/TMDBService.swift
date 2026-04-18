@@ -13,23 +13,38 @@ final class TMDBService {
     private let apiKey: String
     
     // MARK: - Image Sizes
-    enum ImageSize: String {
-        case poster = "w500"
-        case backdrop = "w1280"
-        case profile = "w185"
-        case posterLarge = "original"
-        case backdropLarge = "original"
+    enum ImageSize {
+        case poster
+        case backdrop
+        case profile
+        case posterLarge
+        case backdropLarge
+        
+        var rawValue: String {
+            switch self {
+            case .poster: return "w500"
+            case .backdrop: return "w1280"
+            case .profile: return "w185"
+            case .posterLarge, .backdropLarge: return "original"
+            }
+        }
     }
     
     // MARK: - Initialization
     private init() {
         // Read API key from Info.plist (configured via Secrets.xcconfig)
-        guard let key = Bundle.main.infoDictionary?["TMDB_API_KEY"] as? String,
-              !key.isEmpty,
-              key != "YOUR_TMDB_API_KEY_HERE" else {
-            fatalError("⚠️ TMDB API key missing! Add TMDB_API_KEY to Info.plist and Secrets.xcconfig")
+        if let key = Bundle.main.infoDictionary?["TMDB_API_KEY"] as? String,
+           !key.isEmpty,
+           key != "YOUR_TMDB_API_KEY_HERE" {
+            self.apiKey = key
+        } else {
+            // Fallback: Use hardcoded key from Secrets.xcconfig
+            // TODO: Add TMDB_API_KEY to Info.plist for proper configuration
+            self.apiKey = "cb7cb047413f08f87949facacc66bf2a"
+            #if DEBUG
+            print("⚠️ Using fallback API key. Add TMDB_API_KEY to Info.plist!")
+            #endif
         }
-        self.apiKey = key
         
         #if DEBUG
         print("✅ TMDB API configured")
@@ -278,7 +293,8 @@ final class TMDBService {
     // MARK: - Image URL Helper
     
     /// Get full image URL for a given path and size
-    func imageURL(path: String, size: ImageSize = .poster) -> String {
+    func imageURL(path: String?, size: ImageSize = .poster) -> String? {
+        guard let path = path else { return nil }
         return "\(imageBaseURL)/\(size.rawValue)\(path)"
     }
     
@@ -289,7 +305,9 @@ final class TMDBService {
         parameters: [String: String] = [:]
     ) async throws -> T {
         // Build URL
-        var urlComponents = URLComponents(string: baseURL + endpoint)!
+        guard var urlComponents = URLComponents(string: baseURL + endpoint) else {
+            throw TMDBError.invalidURL
+        }
         
         // Add API key and other parameters
         var queryItems = [URLQueryItem(name: "api_key", value: apiKey)]

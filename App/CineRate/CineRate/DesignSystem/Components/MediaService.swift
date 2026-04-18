@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 /// Integrated service that combines TMDB data with Supabase user data
 /// Provides a unified interface for fetching media content with community ratings and user-specific data
@@ -248,9 +249,10 @@ final class MediaService: ObservableObject {
     private func enrichMedia(_ media: Media, userId: UUID?) async throws -> Media {
         guard let userId = userId else {
             // If no user, just get community rating
+            let dbMediaType = DBMediaType(from: media.type)
             let avgRating = try await reviewService.getAverageRating(
                 for: Int(media.id) ?? 0,
-                mediaType: media.type == .movie ? .movie : .tv
+                mediaType: dbMediaType
             )
             
             var enriched = media
@@ -260,12 +262,12 @@ final class MediaService: ObservableObject {
         }
         
         let mediaId = Int(media.id) ?? 0
-        let mediaType: MediaType = media.type == .movie ? .movie : .tv
+        let dbMediaType = DBMediaType(from: media.type)
         
         // Fetch community rating, user review, and watchlist status in parallel
-        async let avgRating = reviewService.getAverageRating(for: mediaId, mediaType: mediaType)
-        async let userReview = try? reviewService.getUserReview(userId: userId, mediaId: mediaId, mediaType: mediaType)
-        async let inWatchlist = try? watchlistService.isInWatchlist(userId: userId, mediaId: mediaId, mediaType: mediaType)
+        async let avgRating = reviewService.getAverageRating(for: mediaId, mediaType: dbMediaType)
+        async let userReview = try? reviewService.getUserReview(userId: userId, mediaId: mediaId, mediaType: dbMediaType)
+        async let inWatchlist = try? watchlistService.isInWatchlist(userId: userId, mediaId: mediaId, mediaType: dbMediaType)
         
         let (communityRating, review, watchlist) = await (try avgRating, userReview, inWatchlist)
         
@@ -308,10 +310,11 @@ final class MediaService: ObservableObject {
     
     /// Toggle watchlist status for a media item
     func toggleWatchlist(mediaId: Int, mediaType: MediaType, userId: UUID) async throws -> Bool {
+        let dbMediaType = DBMediaType(from: mediaType)
         return try await watchlistService.toggleWatchlist(
             userId: userId,
             mediaId: mediaId,
-            mediaType: mediaType
+            mediaType: dbMediaType
         )
     }
     
@@ -323,10 +326,11 @@ final class MediaService: ObservableObject {
         rating: Double,
         comment: String?
     ) async throws -> Review {
+        let dbMediaType = DBMediaType(from: mediaType)
         return try await reviewService.submitReview(
             userId: userId,
             mediaId: mediaId,
-            mediaType: mediaType,
+            mediaType: dbMediaType,
             rating: rating,
             comment: comment
         )
@@ -334,7 +338,8 @@ final class MediaService: ObservableObject {
     
     /// Get all reviews for a media item
     func getReviews(for mediaId: Int, mediaType: MediaType) async throws -> [Review] {
-        return try await reviewService.getReviews(for: mediaId, mediaType: mediaType)
+        let dbMediaType = DBMediaType(from: mediaType)
+        return try await reviewService.getReviews(for: mediaId, mediaType: dbMediaType)
     }
     
     // MARK: - Error Handling
@@ -347,28 +352,3 @@ final class MediaService: ObservableObject {
     }
 }
 
-// MARK: - MediaType Extension
-
-extension MediaType {
-    /// Convert from SupabaseConfig MediaType to MediaModels MediaType
-    var toAppMediaType: MediaModels.MediaType {
-        switch self {
-        case .movie:
-            return .movie
-        case .tv:
-            return .tvShow
-        }
-    }
-}
-
-extension MediaModels.MediaType {
-    /// Convert from MediaModels MediaType to SupabaseConfig MediaType
-    var toSupabaseMediaType: SupabaseConfig.MediaType {
-        switch self {
-        case .movie:
-            return .movie
-        case .tvShow:
-            return .tv
-        }
-    }
-}

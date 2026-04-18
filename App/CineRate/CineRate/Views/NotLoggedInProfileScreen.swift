@@ -2,6 +2,9 @@
 import SwiftUI
 
 struct NotLoggedInProfileScreen: View {
+    @State private var showSidebar = false
+    @State private var selectedTab: AppTab = .profile
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             // Global Background
@@ -10,7 +13,7 @@ struct NotLoggedInProfileScreen: View {
             
             VStack(spacing: 0) {
                 // Top Navigation Bar
-                TopNavigationBar()
+                TopNavigationBar(showSidebar: $showSidebar)
                     .background(AppColors.surface.ignoresSafeArea(edges: .top))
                 
                 // Main Content Area
@@ -100,7 +103,10 @@ struct NotLoggedInProfileScreen: View {
             }
             
             // Bottom Navigation Bar
-            CustomNavigationBar()
+            CustomNavigationBar(selectedTab: $selectedTab)
+            
+            // Sidebar Overlay
+            Sidebar(isShowing: $showSidebar, isLoggedIn: false)
         }
     }
 }

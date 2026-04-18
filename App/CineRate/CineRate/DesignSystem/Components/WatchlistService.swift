@@ -22,7 +22,7 @@ final class WatchlistService {
     }
     
     /// Check if a media item is in user's watchlist
-    func isInWatchlist(userId: UUID, mediaId: Int, mediaType: MediaType) async throws -> Bool {
+    func isInWatchlist(userId: UUID, mediaId: Int, mediaType: DBMediaType) async throws -> Bool {
         let response: [WatchlistItem] = try await client.database
             .from("watchlist")
             .select()
@@ -41,13 +41,19 @@ final class WatchlistService {
     func addToWatchlist(
         userId: UUID,
         mediaId: Int,
-        mediaType: MediaType
+        mediaType: DBMediaType
     ) async throws -> WatchlistItem {
-        let watchlistData: [String: Any] = [
-            "user_id": userId.uuidString,
-            "media_id": mediaId,
-            "media_type": mediaType.rawValue
-        ]
+        struct WatchlistInsert: Encodable {
+            let user_id: UUID
+            let media_id: Int
+            let media_type: String
+        }
+        
+        let watchlistData = WatchlistInsert(
+            user_id: userId,
+            media_id: mediaId,
+            media_type: mediaType.rawValue
+        )
         
         let response: WatchlistItem = try await client.database
             .from("watchlist")
@@ -66,7 +72,7 @@ final class WatchlistService {
     func removeFromWatchlist(
         userId: UUID,
         mediaId: Int,
-        mediaType: MediaType
+        mediaType: DBMediaType
     ) async throws {
         try await client.database
             .from("watchlist")
@@ -81,7 +87,7 @@ final class WatchlistService {
     func toggleWatchlist(
         userId: UUID,
         mediaId: Int,
-        mediaType: MediaType
+        mediaType: DBMediaType
     ) async throws -> Bool {
         let isInList = try await isInWatchlist(
             userId: userId,

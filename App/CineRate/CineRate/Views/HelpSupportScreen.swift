@@ -4,6 +4,7 @@ import SwiftUI
 struct HelpSupportScreen: View {
     @Environment(\.dismiss) var dismiss
     @State private var showSidebar = false
+    @State private var selectedTab: AppTab = .profile
     @State private var searchText = ""
     @State private var selectedCategory: HelpCategory? = nil
     @State private var showContactForm = false
@@ -186,7 +187,7 @@ struct HelpSupportScreen: View {
             }
             
             // Bottom Navigation Bar
-            CustomNavigationBar()
+            CustomNavigationBar(selectedTab: $selectedTab)
             
             // Sidebar Overlay
             Sidebar(isShowing: $showSidebar, isLoggedIn: true)

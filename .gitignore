@@ -46,3 +46,4 @@ playground.xcworkspace
 
 # App-specific secrets or config
 .env
+App/CineRate/Secrets.xcconfig

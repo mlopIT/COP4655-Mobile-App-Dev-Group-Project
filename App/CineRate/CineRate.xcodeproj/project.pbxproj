@@ -14,6 +14,9 @@
 		8C636FF12F9133540055100A /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 8C636FF02F9133540055100A /* Realtime */; };
 		8C636FF32F9133540055100A /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 8C636FF22F9133540055100A /* Storage */; };
 		8C9209A42F9142E500CB4BE3 /* README_BACKEND_SETUP.md in Resources */ = {isa = PBXBuildFile; fileRef = 8C9209A32F9142E500CB4BE3 /* README_BACKEND_SETUP.md */; };
+		9C113EFA2F9155DD00D79B99 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 9C113EF92F9155DD00D79B99 /* Supabase */; };
+		9C68FA782F914F0400BCEE7F /* PHASE_4_5_COMPLETION_CHECKLIST.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C68FA772F914F0400BCEE7F /* PHASE_4_5_COMPLETION_CHECKLIST.md */; };
+		9CFB2ECC2F92DBD900DF02DA /* SearchScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFB2ECB2F92DBD900DF02DA /* SearchScreenView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -39,6 +42,8 @@
 		8CAEB5F22F9035EA000277C5 /* CineRate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CineRate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8CAEB5FF2F9035ED000277C5 /* CineRateTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CineRateTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8CAEB6092F9035ED000277C5 /* CineRateUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CineRateUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9C68FA772F914F0400BCEE7F /* PHASE_4_5_COMPLETION_CHECKLIST.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PHASE_4_5_COMPLETION_CHECKLIST.md; sourceTree = "<group>"; };
+		9CFB2ECB2F92DBD900DF02DA /* SearchScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchScreenView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -79,6 +84,7 @@
 			files = (
 				8C636FEF2F9133540055100A /* PostgREST in Frameworks */,
 				8C636FED2F9133540055100A /* Functions in Frameworks */,
+				9C113EFA2F9155DD00D79B99 /* Supabase in Frameworks */,
 				8C636FEB2F9133540055100A /* Auth in Frameworks */,
 				8C636FF32F9133540055100A /* Storage in Frameworks */,
 				8C636FF12F9133540055100A /* Realtime in Frameworks */,
@@ -111,6 +117,9 @@
 				8CAEB60C2F9035ED000277C5 /* CineRateUITests */,
 				8CAEB5F32F9035EA000277C5 /* Products */,
 				8C9209A32F9142E500CB4BE3 /* README_BACKEND_SETUP.md */,
+				9C68FA772F914F0400BCEE7F /* PHASE_4_5_COMPLETION_CHECKLIST.md */,
+				9C113EF82F9155DD00D79B99 /* Frameworks */,
+				9CFB2ECB2F92DBD900DF02DA /* SearchScreenView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -122,6 +131,13 @@
 				8CAEB6092F9035ED000277C5 /* CineRateUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9C113EF82F9155DD00D79B99 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -149,6 +165,7 @@
 				8C636FEE2F9133540055100A /* PostgREST */,
 				8C636FF02F9133540055100A /* Realtime */,
 				8C636FF22F9133540055100A /* Storage */,
+				9C113EF92F9155DD00D79B99 /* Supabase */,
 			);
 			productName = CineRate;
 			productReference = 8CAEB5F22F9035EA000277C5 /* CineRate.app */;
@@ -254,6 +271,7 @@
 			files = (
 				8C636FE22F912D6C0055100A /* Secrets.xcconfig in Resources */,
 				8C9209A42F9142E500CB4BE3 /* README_BACKEND_SETUP.md in Resources */,
+				9C68FA782F914F0400BCEE7F /* PHASE_4_5_COMPLETION_CHECKLIST.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,6 +296,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9CFB2ECC2F92DBD900DF02DA /* SearchScreenView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -313,6 +332,7 @@
 /* Begin XCBuildConfiguration section */
 		8CAEB6112F9035ED000277C5 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8C636FE12F912D6C0055100A /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -377,6 +397,7 @@
 		};
 		8CAEB6122F9035ED000277C5 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8C636FE12F912D6C0055100A /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -439,7 +460,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5QRDK7C29K;
+				DEVELOPMENT_TEAM = 7QQP97L2R2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CineRate/Info.plist;
@@ -454,7 +475,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "Michael-Lopez.CineRate";
+				PRODUCT_BUNDLE_IDENTIFIER = "Hazel-Hernandez.CineRate";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPABASE_ANON_KEY = sb_secret_YYvzb042xc55IOx_xKwbuA_1XsLPnhb;
@@ -475,7 +496,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5QRDK7C29K;
+				DEVELOPMENT_TEAM = 7QQP97L2R2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CineRate/Info.plist;
@@ -490,7 +511,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "Michael-Lopez.CineRate";
+				PRODUCT_BUNDLE_IDENTIFIER = "Hazel-Hernandez.CineRate";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPABASE_ANON_KEY = sb_secret_YYvzb042xc55IOx_xKwbuA_1XsLPnhb;
@@ -665,6 +686,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8C636FE92F9133540055100A /* XCRemoteSwiftPackageReference "supabase-swift" */;
 			productName = Storage;
+		};
+		9C113EF92F9155DD00D79B99 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8C636FE92F9133540055100A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

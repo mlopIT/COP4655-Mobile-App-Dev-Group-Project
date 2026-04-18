@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct TopNavigationBar: View {
+    @Binding var showSidebar: Bool
+    
     var body: some View {
         HStack {
             // Logo using the "displayMedium" or custom size if needed
@@ -13,7 +15,9 @@ struct TopNavigationBar: View {
             
             // Hamburger Menu Icon
             Button(action: {
-                print("Menu tapped")
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    showSidebar.toggle()
+                }
             }) {
                 VStack(spacing: 5) {
                     Capsule()
@@ -33,3 +37,4 @@ struct TopNavigationBar: View {
         .background(AppColors.surface) // The solid dark background
     }
 }
+

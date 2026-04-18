@@ -23,8 +23,7 @@ struct SignInScreen: View {
                     
                     FooterSection()
                 }
-                // Safe padding for bottom navigation bar
-                .padding(.bottom, isAnyFieldFocused ? 20 : 120)
+                .padding(.bottom, 20)
             }
             .ignoresSafeArea(edges: .top) // Allows header to bleed up if needed
             // Tap to dismiss keyboard
@@ -32,15 +31,7 @@ struct SignInScreen: View {
             .onTapGesture {
                 isAnyFieldFocused = false
             }
-            
-            // Bottom Navigation Bar - Hidden when keyboard is visible
-            if !isAnyFieldFocused {
-                CustomNavigationBar()
-                    .ignoresSafeArea(.container, edges: .bottom)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
         }
-        .animation(.easeInOut(duration: 0.3), value: isAnyFieldFocused)
     }
 }
 
@@ -99,9 +90,12 @@ struct SignInHeroSection: View {
 }
 
 struct SignInFormSection: View {
+    @StateObject private var authService = AuthService()
     @State private var email = ""
     @State private var password = ""
     @State private var rememberMe = true
+    @State private var isLoading = false
+    @State private var errorMessage: String?
     @FocusState.Binding var isAnyFieldFocused: Bool
     
     var body: some View {
@@ -169,10 +163,22 @@ struct SignInFormSection: View {
             }
             
             VStack(spacing: AppSpacing.md) {
+                // Error message
+                if let errorMessage {
+                    Text(errorMessage)
+                        .font(AppFonts.bodySmall)
+                        .foregroundColor(.red)
+                        .padding(.horizontal, AppSpacing.md)
+                        .padding(.vertical, AppSpacing.sm)
+                        .background(Color.red.opacity(0.1))
+                        .cornerRadius(AppRadius.md)
+                }
+                
                 Button("SIGN IN") {
-                    // Sign in action
+                    handleSignIn()
                 }
                 .buttonStyle(PrimaryButtonStyle())
+                .disabled(isLoading)
                 
                 // Divider with "OR"
                 HStack {
@@ -232,6 +238,31 @@ struct SignInFormSection: View {
             }
         }
         .padding(.horizontal, AppSpacing.lg)
+    }
+    
+    // MARK: - Sign In Handler
+    
+    private func handleSignIn() {
+        // Validate inputs
+        guard !email.isEmpty, !password.isEmpty else {
+            errorMessage = "Please enter both email and password"
+            return
+        }
+        
+        isLoading = true
+        errorMessage = nil
+        
+        Task {
+            do {
+                try await authService.signIn(email: email, password: password)
+                // Success - navigation will be handled by auth state listener
+                print("✅ Sign in successful")
+            } catch {
+                errorMessage = "Invalid email or password. Please try again."
+                print("❌ Sign in error: \(error)")
+            }
+            isLoading = false
+        }
     }
 }
 

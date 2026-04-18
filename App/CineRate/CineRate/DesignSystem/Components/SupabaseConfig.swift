@@ -51,7 +51,12 @@ final class SupabaseConfig {
         
         self.client = SupabaseClient(
             supabaseURL: validURL,
-            supabaseKey: supabaseAnonKey
+            supabaseKey: supabaseAnonKey,
+            options: .init(
+                auth: .init(
+                    emitLocalSessionAsInitialSession: true
+                )
+            )
         )
         
         #if DEBUG
@@ -86,7 +91,7 @@ struct Review: Codable, Identifiable {
     let id: UUID
     let userId: UUID
     let mediaId: Int
-    let mediaType: MediaType
+    let mediaType: DBMediaType
     let rating: Double
     let comment: String?
     let createdAt: Date
@@ -108,10 +113,10 @@ struct Review: Codable, Identifiable {
     }
 }
 
-/// Media type enum
-enum MediaType: String, Codable {
-    case movie
-    case tv
+/// Media type enum for database (uses raw values "movie" and "tv" to match database)
+enum DBMediaType: String, Codable {
+    case movie = "movie"
+    case tv = "tv"
 }
 
 /// Watchlist item model
@@ -119,7 +124,7 @@ struct WatchlistItem: Codable, Identifiable {
     let id: UUID
     let userId: UUID
     let mediaId: Int
-    let mediaType: MediaType
+    let mediaType: DBMediaType
     let addedAt: Date
     
     enum CodingKeys: String, CodingKey {
@@ -141,3 +146,27 @@ struct AverageRating: Codable {
         case totalReviews = "total_reviews"
     }
 }
+// MARK: - MediaType Conversion Extensions
+
+extension DBMediaType {
+    /// Convert from app MediaType to database DBMediaType
+    init(from appMediaType: MediaType) {
+        switch appMediaType {
+        case .movie:
+            self = .movie
+        case .tvShow:
+            self = .tv
+        }
+    }
+    
+    /// Convert to app MediaType
+    var toAppMediaType: MediaType {
+        switch self {
+        case .movie:
+            return .movie
+        case .tv:
+            return .tvShow
+        }
+    }
+}
+

@@ -1,5 +1,6 @@
 // File Name: HomeScreen.swift
 import SwiftUI
+import Auth
 
 // 1. Minimal LightTheme implementation to prevent compiler errors
 struct LightTheme: AppTheme {
@@ -21,9 +22,19 @@ struct LightTheme: AppTheme {
 }
 
 struct HomeScreen: View {
+    @StateObject private var mediaService = MediaService()
+    @EnvironmentObject var authService: AuthService
+    @Binding var selectedTab: AppTab
+    
+    @State private var showSidebar = false
+    @State private var trendingMovies: [Media] = []
+    @State private var trendingTVShows: [Media] = []
+    @State private var isLoading = false
+    @State private var errorMessage: String?
+    
     var body: some View {
-        
-        ZStack(alignment: .bottom) {
+        NavigationStack {
+            ZStack(alignment: .bottom) {
             
             // 1. Global Background
             AppColors.surface
@@ -33,7 +44,7 @@ struct HomeScreen: View {
                 // 2. The Header
                 // We wrap it in another background that ignores the top safe area
                 // This makes the black bar extend behind the Notch/Dynamic Island
-                TopNavigationBar()
+                TopNavigationBar(showSidebar: $showSidebar)
                     .background(AppColors.surface.ignoresSafeArea(edges: .top))
                 
                 
@@ -41,12 +52,26 @@ struct HomeScreen: View {
                 ScrollView {
                     VStack(spacing: 0) {
                         
-                        // Ensure MovieHeroView.swift is in your project.
-                        MovieHeroView()
-                            .frame(height: 500) // Defining the height for the preview layout
+                        // Hero section with real trending movie
+                        if let heroMovie = trendingMovies.first {
+                            MovieHeroView(movie: heroMovie)
+                                .frame(height: 500)
+                        } else if isLoading {
+                            // Loading placeholder
+                            ZStack {
+                                AppColors.surfaceContainer
+                                ProgressView()
+                                    .tint(AppColors.primary)
+                            }
+                            .frame(height: 500)
+                        } else {
+                            // Error or empty state
+                            MovieHeroView(movie: nil)
+                                .frame(height: 500)
+                        }
                         
-                        // We add vertical padding so it doesn't touch the hero image
-                        TopRatedSection()
+                        // Trending TV Shows section with real data
+                        TopRatedSection(tvShows: trendingTVShows, isLoading: isLoading)
                             .padding(.vertical, AppSpacing.xl)
                         
                         // 3. Explore Genres Section
@@ -61,9 +86,56 @@ struct HomeScreen: View {
             }
             
             // 3. The Navigation Layer - Now pinned to bottom of ZStack
-            CustomNavigationBar()
+            CustomNavigationBar(selectedTab: $selectedTab)
                 // Ensure the theme is injected if using .glass() or theme tokens
                 .environment(\.theme, DarkTheme())
+            
+            // Sidebar Overlay
+            Sidebar(isShowing: $showSidebar, isLoggedIn: true)
+            }
+            .navigationBarHidden(true)
+            .task {
+                await loadContent()
+            }
         }
+    }
+    
+    // MARK: - Data Loading
+    
+    private func loadContent() async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            // Get current user ID if authenticated
+            let userId = authService.currentUser?.id
+            
+            // Load trending movies and TV shows in parallel for better performance
+            async let movies = mediaService.getTrendingMovies(userId: userId)
+            async let tvShows = mediaService.getTrendingTVShows(userId: userId)
+            
+            // Await both results
+            trendingMovies = try await movies
+            trendingTVShows = try await tvShows
+            
+            #if DEBUG
+            print("✅ Loaded \(trendingMovies.count) trending movies")
+            print("✅ Loaded \(trendingTVShows.count) trending TV shows")
+            #endif
+        } catch is CancellationError {
+            // Task was cancelled (user navigated away), ignore silently
+            #if DEBUG
+            print("ℹ️ Content loading cancelled")
+            #endif
+        } catch {
+            errorMessage = "Failed to load content: \(error.localizedDescription)"
+            print("❌ Error loading home content: \(error)")
+            
+            // Set empty arrays on error to prevent crashes
+            trendingMovies = []
+            trendingTVShows = []
+        }
+        
+        isLoading = false
     }
 }
