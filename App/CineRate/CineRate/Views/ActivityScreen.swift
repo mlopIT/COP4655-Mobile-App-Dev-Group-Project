@@ -3,8 +3,8 @@ import Auth
 
 struct ActivityScreen: View {
     @EnvironmentObject var authService: AuthService
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @Binding var selectedTab: AppTab
-    @State private var showSidebar = false
     @State private var selectedFilter: ActivityFilter = .all
     @State private var activities: [ActivityItem] = []
     @State private var isLoading = false
@@ -24,7 +24,7 @@ struct ActivityScreen: View {
             
             VStack(spacing: 0) {
                 // Header
-                ActivityHeader(showSidebar: $showSidebar)
+                ActivityHeader(showSidebar: $navigationCoordinator.showSidebar)
                     .background(AppColors.surface.ignoresSafeArea(edges: .top))
                 
                 if authService.isAuthenticated {
@@ -54,7 +54,7 @@ struct ActivityScreen: View {
             CustomNavigationBar(selectedTab: $selectedTab)
             
             // Sidebar
-            Sidebar(isShowing: $showSidebar, isLoggedIn: authService.isAuthenticated)
+            Sidebar(isShowing: $navigationCoordinator.showSidebar)
         }
         .task {
             if authService.isAuthenticated {

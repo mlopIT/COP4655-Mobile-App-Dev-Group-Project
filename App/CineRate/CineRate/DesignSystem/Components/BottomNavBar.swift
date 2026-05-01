@@ -50,10 +50,11 @@ struct CustomNavigationBar: View {
 // MARK: - Main Tab Container (Use this as your root view)
 struct MainTabContainer: View {
     @StateObject private var authService = AuthService()
+    @StateObject private var navigationCoordinator = NavigationCoordinator()
     @State private var selectedTab: AppTab = .home
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationCoordinator.path) {
             ZStack(alignment: .bottom) {
                 // Content based on selected tab
                 Group {
@@ -69,11 +70,18 @@ struct MainTabContainer: View {
                     }
                 }
                 .environmentObject(authService)
+                .environmentObject(navigationCoordinator)
                 
                 // Bottom Navigation Bar
                 CustomNavigationBar(selectedTab: $selectedTab)
             }
             .navigationBarHidden(true)
+            .navigationDestination(for: NavigationDestination.self) { destination in
+                NavigationCoordinator.view(for: destination)
+                    .environmentObject(authService)
+                    .environmentObject(navigationCoordinator)
+                    .navigationBarBackButtonHidden(true)
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ struct MediaDetailScreen: View {
     let media: Media
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var authService: AuthService
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var showSidebar = false
     @State private var isInWatchlist = false
     @State private var showRateReview = false
@@ -73,7 +74,7 @@ struct MediaDetailScreen: View {
                 // CustomNavigationBar()
                 
                 // Sidebar Overlay
-                Sidebar(isShowing: $showSidebar, isLoggedIn: authService.isAuthenticated)
+                Sidebar(isShowing: $showSidebar)
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
         }

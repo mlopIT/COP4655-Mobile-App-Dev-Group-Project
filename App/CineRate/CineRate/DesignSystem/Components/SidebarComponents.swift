@@ -5,7 +5,8 @@ import SwiftUI
 /// Main sidebar component that displays different content based on login state
 struct Sidebar: View {
     @Binding var isShowing: Bool
-    let isLoggedIn: Bool
+    @EnvironmentObject var authService: AuthService
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     
     var body: some View {
         ZStack(alignment: .trailing) {
@@ -25,7 +26,7 @@ struct Sidebar: View {
                 HStack(spacing: 0) {
                     Spacer()
                     
-                    if isLoggedIn {
+                    if authService.isAuthenticated {
                         LoggedInSidebarContent(isShowing: $isShowing)
                     } else {
                         LoggedOutSidebarContent(isShowing: $isShowing)
@@ -41,6 +42,8 @@ struct Sidebar: View {
 // MARK: - Logged In Sidebar
 struct LoggedInSidebarContent: View {
     @Binding var isShowing: Bool
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
+    @EnvironmentObject var authService: AuthService
     
     var body: some View {
         VStack(spacing: 0) {
@@ -119,37 +122,40 @@ struct LoggedInSidebarContent: View {
                     SidebarMenuItem(
                         icon: "house.fill",
                         title: "Home",
-                        action: { print("Home tapped") }
+                        action: { 
+                            navigationCoordinator.popToRoot()
+                            isShowing = false
+                        }
                     )
                     
                     SidebarMenuItem(
                         icon: "flame.fill",
                         title: "Trending",
-                        action: { print("Trending tapped") }
+                        action: { navigationCoordinator.navigate(to: .trending) }
                     )
                     
                     SidebarMenuItem(
                         icon: "star.fill",
                         title: "Top Rated",
-                        action: { print("Top Rated tapped") }
+                        action: { navigationCoordinator.navigate(to: .topRated) }
                     )
                     
                     SidebarMenuItem(
                         icon: "film.fill",
                         title: "Movies",
-                        action: { print("Movies tapped") }
+                        action: { navigationCoordinator.navigate(to: .movies) }
                     )
                     
                     SidebarMenuItem(
                         icon: "tv.fill",
                         title: "TV Shows",
-                        action: { print("TV Shows tapped") }
+                        action: { navigationCoordinator.navigate(to: .tvShows) }
                     )
                     
                     SidebarMenuItem(
                         icon: "tag.fill",
                         title: "Genres",
-                        action: { print("Genres tapped") }
+                        action: { navigationCoordinator.navigate(to: .genres) }
                     )
                     
                     // Library Section
@@ -160,34 +166,34 @@ struct LoggedInSidebarContent: View {
                         icon: "star.circle.fill",
                         title: "My Ratings",
                         badge: "147",
-                        action: { print("My Ratings tapped") }
+                        action: { navigationCoordinator.navigate(to: .myRatings) }
                     )
                     
                     SidebarMenuItem(
                         icon: "bookmark.fill",
                         title: "Watchlist",
                         badge: "89",
-                        action: { print("Watchlist tapped") }
+                        action: { navigationCoordinator.navigate(to: .watchlist) }
                     )
                     
                     SidebarMenuItem(
                         icon: "heart.fill",
                         title: "Favorites",
                         badge: "42",
-                        action: { print("Favorites tapped") }
+                        action: { navigationCoordinator.navigate(to: .favorites) }
                     )
                     
                     SidebarMenuItem(
                         icon: "clock.fill",
                         title: "Watch History",
-                        action: { print("Watch History tapped") }
+                        action: { navigationCoordinator.navigate(to: .watchHistory) }
                     )
                     
                     SidebarMenuItem(
                         icon: "square.and.pencil",
                         title: "My Reviews",
                         badge: "32",
-                        action: { print("My Reviews tapped") }
+                        action: { navigationCoordinator.navigate(to: .myReviews) }
                     )
                     
                     // Social Section
@@ -197,20 +203,20 @@ struct LoggedInSidebarContent: View {
                     SidebarMenuItem(
                         icon: "person.2.fill",
                         title: "Following",
-                        action: { print("Following tapped") }
+                        action: { navigationCoordinator.navigate(to: .following) }
                     )
                     
                     SidebarMenuItem(
                         icon: "bell.fill",
                         title: "Activity",
                         badge: "3",
-                        action: { print("Activity tapped") }
+                        action: { navigationCoordinator.navigate(to: .activity) }
                     )
                     
                     SidebarMenuItem(
                         icon: "bubble.left.and.bubble.right.fill",
                         title: "Discussions",
-                        action: { print("Discussions tapped") }
+                        action: { navigationCoordinator.navigate(to: .discussions) }
                     )
                     
                     // Settings Section
@@ -220,19 +226,19 @@ struct LoggedInSidebarContent: View {
                     SidebarMenuItem(
                         icon: "gearshape.fill",
                         title: "Settings",
-                        action: { print("Settings tapped") }
+                        action: { navigationCoordinator.navigate(to: .settings) }
                     )
                     
                     SidebarMenuItem(
                         icon: "questionmark.circle.fill",
                         title: "Help & Support",
-                        action: { print("Help tapped") }
+                        action: { navigationCoordinator.navigate(to: .helpSupport) }
                     )
                     
                     SidebarMenuItem(
                         icon: "info.circle.fill",
                         title: "About",
-                        action: { print("About tapped") }
+                        action: { navigationCoordinator.navigate(to: .about) }
                     )
                 }
                 .padding(.top, AppSpacing.md)
@@ -246,7 +252,15 @@ struct LoggedInSidebarContent: View {
                     .background(AppColors.outlineVariant)
                 
                 Button(action: {
-                    print("Sign Out tapped")
+                    Task {
+                        do {
+                            try await authService.signOut()
+                            navigationCoordinator.popToRoot()
+                            isShowing = false
+                        } catch {
+                            print("❌ Sign out error: \(error)")
+                        }
+                    }
                 }) {
                     HStack(spacing: AppSpacing.md) {
                         Image(systemName: "rectangle.portrait.and.arrow.right")
@@ -274,6 +288,7 @@ struct LoggedInSidebarContent: View {
 // MARK: - Logged Out Sidebar
 struct LoggedOutSidebarContent: View {
     @Binding var isShowing: Bool
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     
     var body: some View {
         VStack(spacing: 0) {
@@ -325,7 +340,7 @@ struct LoggedOutSidebarContent: View {
                 // Sign In / Create Account Buttons
                 VStack(spacing: AppSpacing.md) {
                     Button(action: {
-                        print("Sign In tapped")
+                        navigationCoordinator.navigate(to: .signIn)
                     }) {
                         Text("Sign In")
                             .font(AppFonts.body)
@@ -338,7 +353,7 @@ struct LoggedOutSidebarContent: View {
                     }
                     
                     Button(action: {
-                        print("Create Account tapped")
+                        navigationCoordinator.navigate(to: .createAccount)
                     }) {
                         Text("Create Account")
                             .font(AppFonts.body)
@@ -367,43 +382,46 @@ struct LoggedOutSidebarContent: View {
                     SidebarMenuItem(
                         icon: "house.fill",
                         title: "Home",
-                        action: { print("Home tapped") }
+                        action: { 
+                            navigationCoordinator.popToRoot()
+                            isShowing = false
+                        }
                     )
                     
                     SidebarMenuItem(
                         icon: "flame.fill",
                         title: "Trending",
-                        action: { print("Trending tapped") }
+                        action: { navigationCoordinator.navigate(to: .trending) }
                     )
                     
                     SidebarMenuItem(
                         icon: "star.fill",
                         title: "Top Rated",
-                        action: { print("Top Rated tapped") }
+                        action: { navigationCoordinator.navigate(to: .topRated) }
                     )
                     
                     SidebarMenuItem(
                         icon: "film.fill",
                         title: "Movies",
-                        action: { print("Movies tapped") }
+                        action: { navigationCoordinator.navigate(to: .movies) }
                     )
                     
                     SidebarMenuItem(
                         icon: "tv.fill",
                         title: "TV Shows",
-                        action: { print("TV Shows tapped") }
+                        action: { navigationCoordinator.navigate(to: .tvShows) }
                     )
                     
                     SidebarMenuItem(
                         icon: "tag.fill",
                         title: "Browse Genres",
-                        action: { print("Genres tapped") }
+                        action: { navigationCoordinator.navigate(to: .genres) }
                     )
                     
                     SidebarMenuItem(
                         icon: "magnifyingglass",
                         title: "Search",
-                        action: { print("Search tapped") }
+                        action: { navigationCoordinator.navigate(to: .search) }
                     )
                     
                     // Info Section
@@ -413,19 +431,19 @@ struct LoggedOutSidebarContent: View {
                     SidebarMenuItem(
                         icon: "questionmark.circle.fill",
                         title: "Help & Support",
-                        action: { print("Help tapped") }
+                        action: { navigationCoordinator.navigate(to: .helpSupport) }
                     )
                     
                     SidebarMenuItem(
                         icon: "info.circle.fill",
                         title: "About CineRate",
-                        action: { print("About tapped") }
+                        action: { navigationCoordinator.navigate(to: .about) }
                     )
                     
                     SidebarMenuItem(
                         icon: "doc.text.fill",
                         title: "Terms & Privacy",
-                        action: { print("Terms tapped") }
+                        action: { navigationCoordinator.navigate(to: .termsPrivacy) }
                     )
                 }
                 .padding(.top, AppSpacing.md)
@@ -539,7 +557,14 @@ struct SidebarStatItem: View {
     ZStack {
         AppColors.surface.ignoresSafeArea()
         
-        Sidebar(isShowing: .constant(true), isLoggedIn: true)
+        Sidebar(isShowing: .constant(true))
+            .environmentObject(AuthService())
+            .environmentObject(NavigationCoordinator())
+    }
+    .onAppear {
+        // Simulate logged in state for preview
+        let authService = AuthService()
+        authService.isAuthenticated = true
     }
 }
 
@@ -547,6 +572,8 @@ struct SidebarStatItem: View {
     ZStack {
         AppColors.surface.ignoresSafeArea()
         
-        Sidebar(isShowing: .constant(true), isLoggedIn: false)
+        Sidebar(isShowing: .constant(true))
+            .environmentObject(AuthService())
+            .environmentObject(NavigationCoordinator())
     }
 }

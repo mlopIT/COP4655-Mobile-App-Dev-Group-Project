@@ -3,7 +3,7 @@ import SwiftUI
 
 struct HelpSupportScreen: View {
     @Environment(\.dismiss) var dismiss
-    @State private var showSidebar = false
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var selectedTab: AppTab = .profile
     @State private var searchText = ""
     @State private var selectedCategory: HelpCategory? = nil
@@ -13,7 +13,7 @@ struct HelpSupportScreen: View {
         ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
                 // Top Navigation Bar
-                HelpSupportNavigationBar(showSidebar: $showSidebar)
+                HelpSupportNavigationBar(showSidebar: $navigationCoordinator.showSidebar)
                     .background(AppColors.surface.ignoresSafeArea(edges: .top))
                 
                 // Main Content
@@ -190,7 +190,7 @@ struct HelpSupportScreen: View {
             CustomNavigationBar(selectedTab: $selectedTab)
             
             // Sidebar Overlay
-            Sidebar(isShowing: $showSidebar, isLoggedIn: true)
+            Sidebar(isShowing: $navigationCoordinator.showSidebar)
         }
         .ignoresSafeArea(.all, edges: .bottom)
         .sheet(isPresented: $showContactForm) {

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8C636FE22F912D6C0055100A /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 8C636FE12F912D6C0055100A /* Secrets.xcconfig */; };
 		8C636FEB2F9133540055100A /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 8C636FEA2F9133540055100A /* Auth */; };
 		8C636FED2F9133540055100A /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 8C636FEC2F9133540055100A /* Functions */; };
 		8C636FEF2F9133540055100A /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 8C636FEE2F9133540055100A /* PostgREST */; };
@@ -37,7 +36,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		8C636FE12F912D6C0055100A /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		8C9209A32F9142E500CB4BE3 /* README_BACKEND_SETUP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README_BACKEND_SETUP.md; sourceTree = "<group>"; };
 		8CAEB5F22F9035EA000277C5 /* CineRate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CineRate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8CAEB5FF2F9035ED000277C5 /* CineRateTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CineRateTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,7 +109,6 @@
 		8CAEB5E92F9035EA000277C5 = {
 			isa = PBXGroup;
 			children = (
-				8C636FE12F912D6C0055100A /* Secrets.xcconfig */,
 				8CAEB5F42F9035EA000277C5 /* CineRate */,
 				8CAEB6022F9035ED000277C5 /* CineRateTests */,
 				8CAEB60C2F9035ED000277C5 /* CineRateUITests */,
@@ -269,7 +266,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8C636FE22F912D6C0055100A /* Secrets.xcconfig in Resources */,
 				8C9209A42F9142E500CB4BE3 /* README_BACKEND_SETUP.md in Resources */,
 				9C68FA782F914F0400BCEE7F /* PHASE_4_5_COMPLETION_CHECKLIST.md in Resources */,
 			);
@@ -332,7 +328,6 @@
 /* Begin XCBuildConfiguration section */
 		8CAEB6112F9035ED000277C5 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8C636FE12F912D6C0055100A /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -397,7 +392,6 @@
 		};
 		8CAEB6122F9035ED000277C5 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8C636FE12F912D6C0055100A /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -460,7 +454,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 7QQP97L2R2;
+				DEVELOPMENT_TEAM = 5QRDK7C29K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CineRate/Info.plist;
@@ -475,7 +469,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "Hazel-Hernandez.CineRate";
+				PRODUCT_BUNDLE_IDENTIFIER = "Michael-Lopez.CineRate";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPABASE_ANON_KEY = sb_secret_YYvzb042xc55IOx_xKwbuA_1XsLPnhb;
@@ -496,7 +490,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 7QQP97L2R2;
+				DEVELOPMENT_TEAM = 5QRDK7C29K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CineRate/Info.plist;
@@ -511,7 +505,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "Hazel-Hernandez.CineRate";
+				PRODUCT_BUNDLE_IDENTIFIER = "Michael-Lopez.CineRate";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPABASE_ANON_KEY = sb_secret_YYvzb042xc55IOx_xKwbuA_1XsLPnhb;

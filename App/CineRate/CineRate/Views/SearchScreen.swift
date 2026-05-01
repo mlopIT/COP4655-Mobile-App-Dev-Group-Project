@@ -4,12 +4,12 @@ import Auth
 struct SearchScreenView: View {
     @StateObject private var mediaService = MediaService()
     @EnvironmentObject var authService: AuthService
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     var selectedTab: Binding<AppTab>?
     
     @State private var searchText = ""
     @State private var searchResults: [Media] = []
     @State private var isSearching = false
-    @State private var showSidebar = false
     @FocusState private var isSearchFieldFocused: Bool
     
     // Debounce timer
@@ -24,7 +24,7 @@ struct SearchScreenView: View {
             
             VStack(spacing: 0) {
                 // 2. Top Navigation Bar
-                TopNavigationBar(showSidebar: $showSidebar)
+                TopNavigationBar(showSidebar: $navigationCoordinator.showSidebar)
                     .background(AppColors.surface.ignoresSafeArea(edges: .top))
                 
                 // 3. Search Content
@@ -70,7 +70,7 @@ struct SearchScreenView: View {
             }
             
             // Sidebar
-            Sidebar(isShowing: $showSidebar, isLoggedIn: authService.isAuthenticated)
+            Sidebar(isShowing: $navigationCoordinator.showSidebar)
         }
         .animation(.easeInOut(duration: 0.3), value: isSearchFieldFocused)
         .onChange(of: searchText) { newValue in
@@ -189,4 +189,7 @@ struct SearchScreenView_Previews: PreviewProvider {
         }
     }
 }
+
+// Note: SearchScreen is now defined in SearchScreenView.swift
+// This file contains the alternative SearchScreenView implementation
 

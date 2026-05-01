@@ -3,7 +3,7 @@ import SwiftUI
 
 struct SettingsScreen: View {
     @Environment(\.dismiss) var dismiss
-    @State private var showSidebar = false
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var selectedTab: AppTab = .profile
     
     // Settings State
@@ -31,7 +31,7 @@ struct SettingsScreen: View {
             
             VStack(spacing: 0) {
                 // Top Navigation Bar
-                SettingsNavigationBar(showSidebar: $showSidebar)
+                SettingsNavigationBar(showSidebar: $navigationCoordinator.showSidebar)
                     .background(AppColors.surface.ignoresSafeArea(edges: .top))
                 
                 // Main Content
@@ -240,7 +240,7 @@ struct SettingsScreen: View {
             CustomNavigationBar(selectedTab: $selectedTab)
             
             // Sidebar Overlay
-            Sidebar(isShowing: $showSidebar, isLoggedIn: true)
+            Sidebar(isShowing: $navigationCoordinator.showSidebar)
         }
         .ignoresSafeArea(.all, edges: .bottom)
     }

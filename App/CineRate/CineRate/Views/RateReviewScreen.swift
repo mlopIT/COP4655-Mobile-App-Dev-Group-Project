@@ -6,6 +6,7 @@ struct RateReviewScreen: View {
     let media: Media
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var authService: AuthService
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var showSidebar = false
     @State private var selectedTab: AppTab = .home
     
@@ -126,7 +127,7 @@ struct RateReviewScreen: View {
             CustomNavigationBar(selectedTab: $selectedTab)
             
             // Sidebar Overlay
-            Sidebar(isShowing: $showSidebar, isLoggedIn: true)
+            Sidebar(isShowing: $showSidebar)
         }
         .ignoresSafeArea(.all, edges: .bottom)
         .alert("Review Submitted!", isPresented: $showSubmitConfirmation) {

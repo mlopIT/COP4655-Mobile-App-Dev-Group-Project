@@ -2,6 +2,8 @@
 import SwiftUI
 
 struct LoggedInProfileScreen: View {
+    @EnvironmentObject var authService: AuthService
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @State private var showSidebar = false
     @State private var selectedTab: AppTab = .profile
     
@@ -123,7 +125,7 @@ struct LoggedInProfileScreen: View {
             CustomNavigationBar(selectedTab: $selectedTab)
             
             // Sidebar Overlay
-            Sidebar(isShowing: $showSidebar, isLoggedIn: true)
+            Sidebar(isShowing: $showSidebar)
         }
     }
 }

@@ -3,8 +3,8 @@ import Auth
 
 struct ProfileScreen: View {
     @EnvironmentObject var authService: AuthService
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @Binding var selectedTab: AppTab
-    @State private var showSidebar = false
     @State private var selectedProfileTab: ProfileTab = .ratings
     @State private var showSignOutAlert = false
     
@@ -28,7 +28,7 @@ struct ProfileScreen: View {
             
             VStack(spacing: 0) {
                 // Header
-                ProfileHeader(showSidebar: $showSidebar)
+                ProfileHeader(showSidebar: $navigationCoordinator.showSidebar)
                     .background(AppColors.surface.ignoresSafeArea(edges: .top))
                 
                 if authService.isAuthenticated {
@@ -92,7 +92,7 @@ struct ProfileScreen: View {
             CustomNavigationBar(selectedTab: $selectedTab)
             
             // Sidebar
-            Sidebar(isShowing: $showSidebar, isLoggedIn: authService.isAuthenticated)
+            Sidebar(isShowing: $navigationCoordinator.showSidebar)
         }
         .alert("Sign Out", isPresented: $showSignOutAlert) {
             Button("Cancel", role: .cancel) { }

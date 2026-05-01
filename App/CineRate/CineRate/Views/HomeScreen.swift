@@ -24,17 +24,16 @@ struct LightTheme: AppTheme {
 struct HomeScreen: View {
     @StateObject private var mediaService = MediaService()
     @EnvironmentObject var authService: AuthService
+    @EnvironmentObject var navigationCoordinator: NavigationCoordinator
     @Binding var selectedTab: AppTab
     
-    @State private var showSidebar = false
     @State private var trendingMovies: [Media] = []
     @State private var trendingTVShows: [Media] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
     
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .bottom) {
+        ZStack(alignment: .bottom) {
             
             // 1. Global Background
             AppColors.surface
@@ -44,7 +43,7 @@ struct HomeScreen: View {
                 // 2. The Header
                 // We wrap it in another background that ignores the top safe area
                 // This makes the black bar extend behind the Notch/Dynamic Island
-                TopNavigationBar(showSidebar: $showSidebar)
+                TopNavigationBar(showSidebar: $navigationCoordinator.showSidebar)
                     .background(AppColors.surface.ignoresSafeArea(edges: .top))
                 
                 
@@ -91,13 +90,11 @@ struct HomeScreen: View {
                 .environment(\.theme, DarkTheme())
             
             // Sidebar Overlay
-            Sidebar(isShowing: $showSidebar, isLoggedIn: true)
+            Sidebar(isShowing: $navigationCoordinator.showSidebar)
             }
-            .navigationBarHidden(true)
             .task {
                 await loadContent()
             }
-        }
     }
     
     // MARK: - Data Loading
